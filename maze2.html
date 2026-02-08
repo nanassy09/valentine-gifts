@@ -11,7 +11,7 @@
 body {
   margin: 0;
   height: 100vh;
-  background: url('image/bg.jpeg') no-repeat center center;
+  background: url('bg.jpeg') no-repeat center center;
   background-size: cover;
   display: flex;
   justify-content: center;
@@ -145,7 +145,7 @@ h1 {
 
 <!-- AUDIO PLAYER -->
 <audio id="bgMusic" loop>
-  <source src="audio/backsound.mpeg" type="audio/mpeg">
+  <source src="backsound.mpeg" type="audio/mpeg">
 </audio>
 
 <div class="container">
@@ -163,7 +163,7 @@ h1 {
 <!-- POPUP -->
 <div class="overlay" id="overlay">
   <div class="popup">
-    <img src="image/you.jpeg" id="popupImg" class="popup-img">
+    <img src="you.jpeg" id="popupImg" class="popup-img">
     <h2>Find me</h2>
     <p>
       <br>Akuu kangen nih...<br>
@@ -215,11 +215,11 @@ function draw() {
 
       if (x === px && y === py) {
         d.className += " player";
-        d.innerHTML = `<img src="image/you.jpeg">`;
+        d.innerHTML = `<img src="you.jpeg">`;
       } 
       else if (x === gx && y === gy) {
         d.className += " goal";
-        d.innerHTML = `<img src="image/me.jpeg">`;
+        d.innerHTML = `<img src="me.jpeg">`;
       }
 
       mazeEl.appendChild(d);
@@ -244,7 +244,7 @@ function move(dx,dy) {
     playing=false;
     document.getElementById("overlay").style.display="flex";
 
-    document.getElementById("popupImg").src = "image/letter.jpeg";
+    document.getElementById("popupImg").src = "letter.jpeg";
 
     document.querySelector(".popup h2").textContent="Good job, Sayangg!";
     document.querySelector(".popup p").innerHTML=
@@ -298,4 +298,5 @@ function fadeOutAudio(audio, callback, duration = 2000) {
 </script>
 
 </body>
+
 </html>
