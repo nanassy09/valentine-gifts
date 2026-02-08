@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Me💕</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: url('image/bg.jpeg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+}
+
+.container {
+  text-align: center;
+}
+
+h1 {
+  font-size: 1.3rem;
+  margin-bottom: 14px;
+  color: #cf2f2f;
+}
+
+/* PIXEL MAZE */
+.maze {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-rows: repeat(20, 1fr);
+  width: 300px;
+  height: 300px;
+  background: #fff0f5;
+  border-radius: 16px;
+  border: 3px solid #d84646;
+  box-shadow: 0 10px 30px rgba(255,105,180,.25);
+  overflow: hidden;
+}
+
+.tile {
+  width: 100%;
+  height: 100%;
+}
+
+.wall {
+  background: #db5151;
+}
+
+.path {
+  background: #ffffff;
+}
+
+.player, .goal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* FIX BIAR GAMBAR MUNCUL */
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.player img,
+.goal img {
+  border-radius: 6px;
+}
+
+/* CONTROLS */
+.controls {
+  margin-top: 20px;
+}
+
+.arrow-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg,#ff69b4,#ff1493);
+  color: white;
+  font-size: 20px;
+  margin: 4px;
+}
+
+.arrow-btn:active {
+  transform: scale(0.9);
+}
+
+/* POPUP */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.popup {
+  background: #fff0f5;
+  padding: 28px;
+  border-radius: 22px;
+  max-width: 320px;
+  text-align: center;
+  border: 2px solid #ec555c;
+  animation: pop .4s ease;
+}
+
+/* 👉 UKURAN GAMBAR POPUP */
+.popup-img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  border-radius: 16px;
+  margin-bottom: 12px;
+}
+
+@keyframes pop {
+  from { transform: scale(.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.popup button {
+  margin-top: 16px;
+  padding: 10px 24px;
+  border-radius: 20px;
+  border: none;
+  background: #d85252;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<!-- AUDIO PLAYER -->
+<audio id="bgMusic" loop>
+  <source src="audio/backsound.mpeg" type="audio/mpeg">
+</audio>
+
+<div class="container">
+  <h1> Find The Way To Me! </h1>
+  <div class="maze" id="maze"></div>
+
+  <div class="controls">
+    <button class="arrow-btn" onclick="move(0,-1)">⬆️</button><br>
+    <button class="arrow-btn" onclick="move(-1,0)">⬅️</button>
+    <button class="arrow-btn" onclick="move(0,1)">⬇️</button>
+    <button class="arrow-btn" onclick="move(1,0)">➡️</button>
+  </div>
+</div>
+
+<!-- POPUP -->
+<div class="overlay" id="overlay">
+  <div class="popup">
+    <img src="image/you.jpeg" id="popupImg" class="popup-img">
+    <h2>Find me</h2>
+    <p>
+      <br>Akuu kangen nih...<br>
+      Temukan jalan ke karakterku!  
+      <br><br>
+      ada hadiah yang menunggu
+    </p>
+    <button onclick="start()">Ayoo!!</button>
+  </div>
+</div>
+
+<script>
+const mazeEl = document.getElementById("maze");
+
+/* 0 = path, 1 = wall */
+const map = [
+"11111111111111111111",
+"00001001000010000001",
+"11101011011111110101",
+"10100010000000000101",
+"10101010111111110101",
+"10001000100000000101",
+"11111011101111111111",
+"10001010001000000001",
+"10111010111111101101",
+"10100000000000001001",
+"10111110101111111011",
+"10000000100001000001",
+"11111110111111111101",
+"10100000000010000001",
+"10111011111110111101",
+"10000010000000000111",
+"10111110111011010001",
+"10100010001001011011",
+"10001000101000001000",
+"11111111111111111111"
+];
+
+let px = 1, py = 1;
+const gx = 18, gy = 18;
+let playing = false;
+
+function draw() {
+  mazeEl.innerHTML = "";
+  for (let y = 0; y < 20; y++) {
+    for (let x = 0; x < 20; x++) {
+      const d = document.createElement("div");
+      d.className = "tile " + (map[y][x] === "1" ? "wall" : "path");
+
+      if (x === px && y === py) {
+        d.className += " player";
+        d.innerHTML = `<img src="image/you.jpeg">`;
+      } 
+      else if (x === gx && y === gy) {
+        d.className += " goal";
+        d.innerHTML = `<img src="image/me.jpeg">`;
+      }
+
+      mazeEl.appendChild(d);
+    }
+  }
+}
+
+function start(){
+  document.getElementById("overlay").style.display="none";
+  playing = true;
+  draw();
+}
+
+function move(dx,dy) {
+  if(!playing) return;
+  const nx = px+dx, ny = py+dy;
+  if(map[ny][nx]==="0"){
+    px=nx; py=ny;
+    draw();
+  }
+  if(px===gx && py===gy){
+    playing=false;
+    document.getElementById("overlay").style.display="flex";
+
+    document.getElementById("popupImg").src = "image/letter.jpeg";
+
+    document.querySelector(".popup h2").textContent="Good job, Sayangg!";
+    document.querySelector(".popup p").innerHTML=
+      "Ini hadiahnyaa buat kamuu<br><br>Penasaran isinyaa? baca pelan pelan yaa sayang";
+    document.querySelector(".popup button").textContent="Buka surat";
+    document.querySelector(".popup button").onclick=()=>{
+      sessionStorage.setItem("musicTime", bgMusic.currentTime);
+      fadeOutAudio(bgMusic, () => {
+        window.location.href = "letter.html?fromMenu=true";
+      });
+    };
+  }
+}
+
+draw();
+
+// Musik
+const bgMusic = document.getElementById("bgMusic");
+
+if (sessionStorage.getItem("musicStarted") === "true") {
+  const savedTime = parseFloat(sessionStorage.getItem("musicTime")) || 0;
+  bgMusic.currentTime = savedTime;
+  bgMusic.volume = 0.8;
+  bgMusic.play().catch(err => console.log("Auto play blocked:", err));
+}
+
+// Update waktu musik setiap 1 detik
+setInterval(() => {
+  if (!bgMusic.paused) {
+    sessionStorage.setItem("musicTime", bgMusic.currentTime);
+  }
+}, 1000);
+
+// Fade out musik
+function fadeOutAudio(audio, callback, duration = 2000) {
+  const startVolume = audio.volume;
+  const startTime = Date.now();
+  
+  const interval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    audio.volume = startVolume * (1 - progress);
+    
+    if (progress === 1) {
+      clearInterval(interval);
+      audio.volume = 0;
+      if (callback) callback();
+    }
+  }, 50);
+}
+</script>
+
+</body>
+</html>

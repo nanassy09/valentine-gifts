@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memories</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: url('image/bg.jpeg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Playfair Display', serif;
+  overflow-x: hidden;
+}
+
+/* COVER PAGE */
+.cover {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: url('image/bg.jpeg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  transition: opacity 0.8s ease;
+}
+
+.cover.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cover h1 {
+  font-size: 2rem;
+  color: #8b2c22; /* maroon warm */
+  margin-bottom: 40px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  background: rgba(255, 245, 198, 0.6); /* soft cream highlight */
+  padding: 16px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(139,44,34,0.25);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.cover h1:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 28px rgba(139,44,34,0.3);
+}
+
+.cover img {
+  width: 300px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.cover img:hover {
+  transform: scale(1.05);
+}
+
+/* SCENE */
+.scene {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* BOOK OPEN */
+.book-open {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-76%, -50%);
+  width: 900px;
+  z-index: 1;
+}
+
+/* PAPER (HALAMAN PUTIH) */
+.paper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  height: 500px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  z-index: 2;
+  background: #fffaf0; /* soft cream halaman */
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(139,44,34,0.1);
+}
+
+.paper::-webkit-scrollbar {
+  display: none;
+}
+
+.paper img {
+  width: 100%;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* NEXT BUTTON */
+.next-btn {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #8b2c22;
+  color: white;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  z-index: 3;
+  opacity: 0;
+  transition: all 0.4s ease;
+  pointer-events: none;
+  box-shadow: 0 6px 20px rgba(139,44,34,0.3);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+.next-btn.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.next-btn:hover {
+  background: #c63838;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139,44,34,0.4);
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUDIO PLAYER -->
+<audio id="bgMusic" loop>
+  <source src="audio/backsound.mpeg" type="audio/mpeg">
+</audio>
+
+<!-- COVER PAGE -->
+<div class="cover" id="cover">
+  <h1>look what i've found</h1>
+  <img src="image/book-cover.jpeg" onclick="openBook()">
+</div>
+
+<div class="scene">
+  <img src="image/book-open.jpeg" class="book-open">
+
+  <div class="paper" id="paper">
+    <img src="image/slide1.jpeg">
+    <img src="image/slide2.jpeg">
+    <img src="image/slide3.jpeg">
+  </div>
+  
+  <!-- NEXT BUTTON -->
+  <button class="next-btn" id="nextBtn" onclick="goToNext('menu.html')">menu</button>
+</div>
+
+<script>
+const paper = document.querySelector(".paper");
+const cover = document.getElementById("cover");
+const bgMusic = document.getElementById("bgMusic");
+
+// Lanjutkan musik
+if (sessionStorage.getItem("musicStarted") === "true") {
+  const savedTime = parseFloat(sessionStorage.getItem("musicTime")) || 0;
+  bgMusic.currentTime = savedTime;
+  bgMusic.volume = 0.8;
+  bgMusic.play().catch(err => console.log("Auto play blocked:", err));
+}
+
+setInterval(() => {
+  if (!bgMusic.paused) {
+    sessionStorage.setItem("musicTime", bgMusic.currentTime);
+  }
+}, 1000);
+
+// Fade out musik
+function fadeOutAudio(audio, callback, duration = 2000) {
+  const startVolume = audio.volume;
+  const startTime = Date.now();
+  
+  const interval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    audio.volume = startVolume * (1 - progress);
+    
+    if (progress === 1) {
+      clearInterval(interval);
+      audio.volume = 0;
+      if (callback) callback();
+    }
+  }, 50);
+}
+
+// Buka buku
+function openBook() {
+  cover.classList.add("hidden");
+}
+
+// Deteksi scroll ke bawah
+paper.addEventListener("scroll", () => {
+  const nextBtn = document.getElementById("nextBtn");
+  const isAtBottom = paper.scrollHeight - paper.scrollTop <= paper.clientHeight + 50;
+  
+  if (isAtBottom) {
+    nextBtn.classList.add("show");
+  } else {
+    nextBtn.classList.remove("show");
+  }
+});
+
+// Fungsi next
+function goToNext() {
+  sessionStorage.setItem("musicTime", bgMusic.currentTime);
+  fadeOutAudio(bgMusic, () => {
+    window.location.href = "menu.html";
+  });
+}
+
+// Manual scroll dengan mouse wheel
+paper.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  paper.scrollTop += e.deltaY;
+}, { passive: false });
+</script>
+
+</body>
+ 

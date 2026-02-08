@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You 🤍</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      background: url('image/bg.jpeg') no-repeat center center;
+  background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+    }
+
+    /* AUDIO PLAYER */
+    audio {
+      display: none;
+    }
+
+    /* WRAPPER */
+    .envelope-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      padding-bottom: 180px; /* ruang buat amplop */
+    }
+
+    /* KERTAS SURAT */
+    .letter-paper {
+      position: relative;
+      z-index: 2;
+      background: #751b1b;
+      padding: 48px 38px;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.08);
+      line-height: 1.9;
+      color: #fff2e8;
+      margin-bottom: 140px; /* efek keluar dari amplop */
+      animation: fadeIn 1.2s ease;
+      border: 2px solid #f3eebe;
+    }
+
+    /* DEKOR HATI */
+    .letter-paper::before,
+    .letter-paper::after {
+      content: "🤍";
+      position: absolute;
+      font-size: 18px;
+      opacity: 0.5;
+    }
+
+    .letter-paper::before {
+      top: 14px;
+      left: 18px;
+    }
+
+    .letter-paper::after {
+      bottom: 14px;
+      right: 18px;
+    }
+
+    .letter-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .letter-paper p {
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+    }
+
+    .highlight {
+      background: #da5353;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .letter-closing {
+      margin-top: 28px;
+      font-style: italic;
+      text-align: right;
+    }
+
+    .next-btn {
+      display: block;
+      margin: 32px auto 0;
+      padding: 10px 30px;
+      border-radius: 30px;
+      border: none;
+      background-color: #cc4040;
+      color: rgb(255, 245, 198);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.3s ease;
+      text-decoration: none;
+      width: fit-content;
+    }
+
+    .next-btn:hover {
+      background-color: #b63838;
+      transform: translateY(-2px);
+    }
+
+    /* AMPL0P */
+    .envelope-back,
+    .envelope-front {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
+
+    .envelope-back {
+      z-index: 1;
+    }
+
+    .envelope-front {
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- AUDIO PLAYER -->
+  <audio id="bgMusic" loop>
+    <source src="audio/backsound.mpeg" type="audio/mpeg">
+  </audio>
+
+  <div class="envelope-wrapper">
+
+    <!-- SURAT -->
+    <div class="letter-paper">
+      <div class="letter-title">A little letter 💌</div>
+
+      <p>Hiii Shidqi🤍</p>
+
+      <p>
+        How are you todayy, sayang-ku?  
+        semoga selalu baik baik ajaa yaa.
+      </p>
+
+      <p>
+        Happy Valentine's Day!  
+        And udah ga kerasa kita udah setahun jalan ya sejak 8 feb kemarin,
+        aku bersyukur banget bisa punya kamu di hidup aku.
+        Meski akhir akhir ini kita berantem teruss :(
+        tapi meski gituu,
+        <span class="highlight">i still love you</span>.
+        aku tau aku sering buat kamu jengkel..
+        maaf yaa sayangg.
+      </p>
+
+      <p>
+        Hadiah ini kecil tapi aku harap kamu ngerti apa yang mau aku sampaikan,
+        anggap ini hadiah kecil buat setahun kita & valentine tahun inii.
+      </p>
+
+      <p>I love you more, sayangg</p>
+
+      <p class="letter-closing">
+        love, Hanaa🤍
+      </p>
+
+      <a href="menu.html" class="next-btn" onclick="saveMusicTime(); fadeOutAudio(bgMusic, () => {}, 2000);">back to menu</a>
+    </div>
+
+  
+  </div>
+
+</body>
+
+<script>
+const bgMusic = document.getElementById("bgMusic");
+
+if (sessionStorage.getItem("musicStarted") === "true") {
+  const savedTime = parseFloat(sessionStorage.getItem("musicTime")) || 0;
+  bgMusic.currentTime = savedTime;
+  bgMusic.volume = 0.8;
+  bgMusic.play().catch(err => console.log("Auto play blocked:", err));
+}
+
+setInterval(() => {
+  if (!bgMusic.paused) {
+    sessionStorage.setItem("musicTime", bgMusic.currentTime);
+  }
+}, 1000);
+
+function saveMusicTime() {
+  sessionStorage.setItem("musicTime", bgMusic.currentTime);
+}
+
+// Fade out musik
+function fadeOutAudio(audio, callback, duration = 2000) {
+  const startVolume = audio.volume;
+  const startTime = Date.now();
+  
+  const interval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    audio.volume = startVolume * (1 - progress);
+    
+    if (progress === 1) {
+      clearInterval(interval);
+      audio.volume = 0;
+      if (callback) callback();
+    }
+  }, 50);
+}
+</script>
+
+</html>

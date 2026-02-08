@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlock Me 💌</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: url('image/bg.jpeg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+}
+
+.card {
+  background: #681818; /* krem lembut seperti letter */
+  padding: 38px 30px;
+  border-radius: 24px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  max-width: 340px;
+  animation: popIn 0.9s ease;
+  border: 2px solid #f3eebe;
+}
+
+.lock {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #fdf3f2; /* merah tua senada tone */
+}
+
+p {
+  font-size: 0.9rem;
+  color: #ffffff; /* cokelat gelap senada letter */
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 1rem;
+  letter-spacing: 6px;
+  margin-bottom: 16px;
+  outline: none;
+}
+
+button {
+  padding: 10px 30px;
+  border-radius: 25px;
+  border: none;
+  background: #cc4040; /* merah tua */
+  color: #fff5c6; /* krem */
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #b63838;
+  transform: scale(1.05);
+}
+
+.error {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: #fa8c8c; /* soft pink untuk error */
+  display: none;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUDIO PLAYER -->
+<audio id="bgMusic" loop>
+  <source src="audio/backsound.mpeg" type="audio/mpeg">
+</audio>
+
+<div class="card">
+  <div class="lock">🔒</div>
+
+  <h1>HEIII</h1>
+  <p>
+    Aku buat game kecill, tapi masih kekunci nihh, ayok coba bukaa
+    <br><br>
+    coba masukin PIN-nya yaa (clue: tanggal jadian kita hehe)
+  </p>
+
+  <input type="password" id="pin" placeholder="••••••" maxlength="6">
+
+  <button onclick="checkPin()">buka dong</button>
+
+  <div class="error" id="error">
+    salah sayangg, coba lagi ya
+  </div>
+</div>
+
+<script>
+const bgMusic = document.getElementById("bgMusic");
+
+// Lanjutkan musik dari halaman sebelumnya
+if (sessionStorage.getItem("musicStarted") === "true") {
+  const savedTime = parseFloat(sessionStorage.getItem("musicTime")) || 0;
+  bgMusic.currentTime = savedTime;
+  bgMusic.volume = 0.8;
+  bgMusic.play().catch(err => console.log("Auto play blocked:", err));
+}
+
+function checkPin() {
+  const pin = document.getElementById("pin").value;
+  const error = document.getElementById("error");
+
+  if (pin === "080225") {
+    sessionStorage.setItem("musicTime", bgMusic.currentTime);
+    fadeOutAudio(bgMusic, () => {
+      window.location.href = "maze.html";
+    });
+  } else {
+    error.style.display = "block";
+  }
+}
+
+// Fade out musik
+function fadeOutAudio(audio, callback, duration = 2000) {
+  const startVolume = audio.volume;
+  const startTime = Date.now();
+  
+  const interval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    audio.volume = startVolume * (1 - progress);
+    
+    if (progress === 1) {
+      clearInterval(interval);
+      audio.volume = 0;
+      if (callback) callback();
+    }
+  }, 50);
+}
+</script>
+
+</body>
+</html>

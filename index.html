@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Valentine 💌</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: url('image/bg.jpeg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+}
+
+.wrapper {
+  text-align: center;
+}
+
+/* HEART CONTAINER */
+.heart {
+  width: 220px;
+  height: 200px;
+  position: relative;
+  margin-bottom: 26px;
+  animation: pop 1.2s ease forwards;
+  transform: scale(0);
+}
+
+/* HEART SHAPE */
+.heart-shape {
+  width: 220px;
+  height: 200px;
+  background: #922929; /* soft red */
+  position: absolute;
+  left: 55px;
+  top: 0;
+}
+
+.heart-shape::before,
+.heart-shape::after {
+  content: "";
+  width: 220px;
+  height: 200px;
+  background: #922929;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.heart-shape::before {
+  top: -100px;
+  left: 0;
+}
+
+.heart-shape::after {
+  left: -110px;
+  top: 0;
+}
+
+/* TEXT */
+.heart-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  z-index: 2;
+}
+
+.heart-text h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.heart-text span {
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+
+/* BUTTON */
+button {
+  padding: 10px 26px;
+  border-radius: 25px;
+  border: none;
+  background: #922929; /* soft pinkish red */
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background: #c63838; /* lebih dark saat hover */
+  transform: translateY(-2px);
+}
+
+/* ANIMATION */
+@keyframes pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUDIO PLAYER -->
+<audio id="bgMusic" loop>
+  <source src="audio/backsound.mpeg" type="audio/mpeg">
+</audio>
+
+<div class="wrapper">
+  <div class="heart">
+    <div class="heart-shape"></div>
+
+    <div class="heart-text">
+      <h1>Happy<br>Valentine Baby</h1>
+      <span>ready to open?</span>
+    </div>
+  </div>
+
+  <button onclick="playMusic()">open me</button>
+</div>
+
+<script>
+// Fade in musik
+function fadeInAudio(audio, duration = 4000) {
+  audio.volume = 0;
+  audio.play().catch(err => console.log("Play error:", err));
+  
+  const startTime = Date.now();
+  const interval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    audio.volume = progress * 0.8;
+    
+    if (progress === 1) clearInterval(interval);
+  }, 50);
+}
+
+// Cek apakah ada audio player global di window
+if (!window.bgMusicPlayer) {
+  const audio = document.getElementById("bgMusic");
+  window.bgMusicPlayer = audio;
+  window.musicStarted = sessionStorage.getItem("musicStarted") === "true";
+  
+  if (window.musicStarted) {
+    const savedTime = parseFloat(sessionStorage.getItem("musicTime")) || 0;
+    audio.currentTime = savedTime;
+    audio.volume = 0.8;
+    audio.play().catch(err => console.log("Auto play blocked:", err));
+  }
+}
+
+function playMusic() {
+  sessionStorage.setItem("musicStarted", "true");
+  sessionStorage.setItem("musicTime", window.bgMusicPlayer.currentTime);
+  
+  fadeInAudio(window.bgMusicPlayer);
+  
+  setTimeout(() => {
+    location.href = 'lock.html';
+  }, 500);
+}
+</script>
+
+</body>
+</html>

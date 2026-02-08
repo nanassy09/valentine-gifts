@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Song For You 🎶</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: url('image/bg.jpeg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+}
+
+.song-card {
+  background: rgb(148, 62, 62);
+  padding: 45px 35px;
+  border-radius: 22px;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(207, 47, 47, 0.123);
+  max-width: 380px;
+  animation: fadeIn 1.2s ease;
+  border: 2px solid #f3eebe;
+}
+
+.song-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 14px;
+  color: #f3eebe;
+}
+
+.song-desc {
+  font-size: 0.95rem;
+  color: #ffffff;
+  margin-bottom: 26px;
+}
+
+.spotify-code {
+  width: 230px;
+  margin-bottom: 26px;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(245, 255, 198, 0.301);
+}
+
+.button-group {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+
+.song-btn,
+.next-btn {
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+/* open song */
+.song-btn {
+  background: #ffffff;
+  color: rgb(99, 27, 27);
+}
+
+.song-btn:hover {
+  background: #ff3961;
+  transform: translateY(-2px);
+}
+
+/* next */
+.next-btn {
+  border: 1px solid #f0f0f0;
+  color: #fffdfd;
+}
+
+.next-btn:hover {
+  background: #ffe0e8;
+}
+  
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUDIO PLAYER -->
+<audio id="bgMusic" loop>
+  <source src="audio/backsound.mpeg" type="audio/mpeg">
+</audio>
+
+<div class="song-card">
+
+  <div class="song-title">I've made  you a playlist 🎧</div>
+
+  <div class="song-desc">
+    Tiap aku denger lagu lagu ini, akuu keinget kamu.
+    Aku buatin jadi 1 playlist!
+  </div>
+  <!-- GANTI GAMBAR DENGAN SPOTIFY CODE -->
+  <img src="image/song.jpg" class="spotify-code">
+
+  <div class="button-group">
+    <!-- GANTI LINK LAGU -->
+    <a href="https://open.spotify.com/playlist/7EHnoX79z4iKzMYE2DAIyS?si=u2nOXAr0RJCVT01F97_54A" target="_blank" class="song-btn">
+      Open Playlist
+    </a>
+
+    <!-- GANTI KE HALAMAN NEXT -->
+    <a href="memories.html" class="next-btn" onclick="saveMusicTime(); fadeOutAudio(bgMusic, () => {}, 2000);">
+      Next
+    </a>
+  </div>
+
+</div>
+
+<script>
+const bgMusic = document.getElementById("bgMusic");
+
+if (sessionStorage.getItem("musicStarted") === "true") {
+  const savedTime = parseFloat(sessionStorage.getItem("musicTime")) || 0;
+  bgMusic.currentTime = savedTime;
+  bgMusic.volume = 0.8;
+  bgMusic.play().catch(err => console.log("Auto play blocked:", err));
+}
+
+setInterval(() => {
+  if (!bgMusic.paused) {
+    sessionStorage.setItem("musicTime", bgMusic.currentTime);
+  }
+}, 1000);
+
+function saveMusicTime() {
+  sessionStorage.setItem("musicTime", bgMusic.currentTime);
+}
+
+// Fade out musik
+function fadeOutAudio(audio, callback, duration = 2000) {
+  const startVolume = audio.volume;
+  const startTime = Date.now();
+  
+  const interval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    audio.volume = startVolume * (1 - progress);
+    
+    if (progress === 1) {
+      clearInterval(interval);
+      audio.volume = 0;
+      if (callback) callback();
+    }
+  }, 50);
+}
+</script>
+</div>
+
+</body>
+</html>
